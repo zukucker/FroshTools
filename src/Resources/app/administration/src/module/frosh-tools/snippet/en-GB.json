@@ -190,7 +190,47 @@
                 "label": "State Machine",
                 "orderTitle": "Order status",
                 "transactionTitle": "Transaction status",
-                "deliveryTitle": "Delivery status"
+                "deliveryTitle": "Delivery status",
+                "searchStates": "Search states...",
+                "searchTransition": "Filter by transition...",
+                "noStateSelected": "Select a state from the list to view its details.",
+                "noStateMachine": "Choose a State Machine from the dropdown above to get started.",
+                "incomingTransitions": "Incoming Transitions",
+                "outgoingTransitions": "Outgoing Transitions",
+                "actions": "Actions",
+                "properties": "Properties",
+                "technicalName": "Technical Name",
+                "stateId": "State ID",
+                "initialState": "Initial State",
+                "terminalState": "Terminal State",
+                "incomingCount": "{count} incoming",
+                "outgoingCount": "{count} outgoing",
+                "yes": "Yes",
+                "no": "No",
+                "actionGroups": "Action Groups",
+                "viewModes": {
+                    "1hop": "1-Hop",
+                    "tree": "Tree",
+                    "full": "Full Graph"
+                },
+                "filterCategory": "Category",
+                "filterType": "State Type",
+                "allCategories": "All Categories",
+                "allTypes": "All Types",
+                "categories": {
+                    "payment": "Payment",
+                    "processing": "Processing",
+                    "shipping": "Shipping",
+                    "customer": "Customer",
+                    "error": "Error",
+                    "other": "Other"
+                },
+                "graph": {
+                    "zoomIn": "Zoom in",
+                    "zoomOut": "Zoom out",
+                    "resetView": "Reset view",
+                    "transitionLabel": "Transition"
+                }
             },
             "statistics": {
                 "title": "Statistics",

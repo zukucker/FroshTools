@@ -190,7 +190,47 @@
                 "label": "State Machine",
                 "orderTitle": "Bestellstatus",
                 "transactionTitle": "Bezahlstatus",
-                "deliveryTitle": "Versandstatus"
+                "deliveryTitle": "Versandstatus",
+                "searchStates": "States durchsuchen...",
+                "searchTransition": "Nach Transition filtern...",
+                "noStateSelected": "Wähle einen State aus der Liste, um Details anzuzeigen.",
+                "noStateMachine": "Wähle oben eine State Machine aus dem Dropdown.",
+                "incomingTransitions": "Eingehende Transitionen",
+                "outgoingTransitions": "Ausgehende Transitionen",
+                "actions": "Aktionen",
+                "properties": "Eigenschaften",
+                "technicalName": "Technischer Name",
+                "stateId": "State ID",
+                "initialState": "Initial State",
+                "terminalState": "Terminal State",
+                "incomingCount": "{count} eingehend",
+                "outgoingCount": "{count} ausgehend",
+                "yes": "Ja",
+                "no": "Nein",
+                "actionGroups": "Aktionsgruppen",
+                "viewModes": {
+                    "1hop": "1-Hop",
+                    "tree": "Baum",
+                    "full": "Gesamtgraph"
+                },
+                "filterCategory": "Kategorie",
+                "filterType": "State-Typ",
+                "allCategories": "Alle Kategorien",
+                "allTypes": "Alle Typen",
+                "categories": {
+                    "payment": "Zahlung",
+                    "processing": "Verarbeitung",
+                    "shipping": "Versand",
+                    "customer": "Kunde",
+                    "error": "Fehler",
+                    "other": "Sonstige"
+                },
+                "graph": {
+                    "zoomIn": "Vergrößern",
+                    "zoomOut": "Verkleinern",
+                    "resetView": "Ansicht zurücksetzen",
+                    "transitionLabel": "Transition"
+                }
             },
             "statistics": {
                 "title": "Statistiken",
