@@ -1,104 +1,349 @@
-<div class="ft frosh-tab-sm">
+<div class="ft sm-explorer">
     <ft-page-head
         :title="$t('frosh-tools.tabs.state-machines.title')"
-        subtitle="Visualize states, transitions and actions for any registered state machine."
-    />
-    <sw-single-select
-        v-model:value="selectedStateMachine"
-        :options="stateMachineOptions"
-        :aside="true"
-        :disable-search-function="true"
-        @update:value="onStateMachineChange"
-        :placeholder="$t('frosh-tools.chooseStateMachine')"
+        subtitle="Explore states, transitions and actions for any registered state machine."
     />
 
-    <div class="state-machine-explorer" v-if="selectedStateMachine">
-        <ft-panel title='States'>
-            <mt-text-field placeholder="State suchen..." />
-            <div class="state" v-for="state in states">
-                {{state.name}}
+    <div class="sm-explorer__toolbar">
+        <sw-single-select
+            v-model:value="selectedStateMachine"
+            :options="stateMachineOptions"
+            :aside="true"
+            :disable-search-function="true"
+            @update:value="onStateMachineChange"
+            :placeholder="$t('frosh-tools.chooseStateMachine')"
+            class="sm-explorer__select"
+        />
+
+        <template v-if="stateMachine">
+            <div class="sm-explorer__view-modes">
+                <button
+                    class="ft-btn"
+                    :class="{ 'ft-btn--primary': viewMode === '1hop' }"
+                    @click="viewMode = '1hop'"
+                >
+                    {{ $t('frosh-tools.tabs.state-machines.viewModes.1hop') }}
+                </button>
+                <button
+                    class="ft-btn"
+                    :class="{ 'ft-btn--primary': viewMode === 'tree' }"
+                    @click="viewMode = 'tree'"
+                >
+                    {{ $t('frosh-tools.tabs.state-machines.viewModes.tree') }}
+                </button>
+                <button
+                    class="ft-btn"
+                    :class="{ 'ft-btn--primary': viewMode === 'full' }"
+                    @click="viewMode = 'full'"
+                >
+                    {{ $t('frosh-tools.tabs.state-machines.viewModes.full') }}
+                </button>
             </div>
 
-        </ft-panel>
-
-        <ft-panel title="State">
-            <div><b>Beschreibung</b></div>
-            <p>Startzustand einer neuen order Transaction</p>
-
-            <div><b>Eingehende Transitionen(2)</b></div>
-            <div class="incoming-transitions">
-                <div class="transition">
-                    <div>reopen</div>
-                    <span>von Reminded</span>
-                </div>
-                <div class="transition">
-                    <div>process_unconfirmed</div>
-                    <span>von: Unconfirmed</span>
-                </div>
+            <div class="sm-explorer__filters">
+                <sw-single-select
+                    v-model:value="filterCategory"
+                    :options="categoryOptions"
+                    :placeholder="$t('frosh-tools.tabs.state-machines.filterCategory')"
+                    class="sm-explorer__filter-select"
+                />
+                <sw-single-select
+                    v-model:value="filterType"
+                    :options="typeOptions"
+                    :placeholder="$t('frosh-tools.tabs.state-machines.filterType')"
+                    class="sm-explorer__filter-select"
+                />
             </div>
-            <div><b>Ausgehende Transitionen(5)</b></div>
-            <div class="outgoing-transitions">
-                <div class="transition">
-                    <div>pay</div>
-                    <span>Paid</span>
-                </div>
-                <div class="transition">
-                    <div>cancel</div>
-                    <span>Canceled</span>
-                </div>
-                <div class="transition">
-                    <div>fail</div>
-                    <span>Failed</span>
-                </div>
-                <div class="transition">
-                    <div>process</div>
-                    <span>In Progress</span>
-                </div>
-                <div class="transition">
-                    <div>remind</div>
-                    <span>Reminded</span>
-                </div>
-            </div>
-
-        </ft-panel>
-
-        <ft-panel title="Graph">
-
-        </ft-panel>
+        </template>
     </div>
-    {#<ft-panel :title="$t('frosh-tools.tabs.state-machines.label')">#}
-        {#<template #actions>#}
-            {#<div class="frosh-tab-sm__select">#}
-                {#<sw-single-select#}
-                    {#v-model:value="selectedStateMachine"#}
-                    {#:options="stateMachineOptions"#}
-                    {#:aside="true"#}
-                    {#:disable-search-function="true"#}
-                    {#@update:value="onStateMachineChange"#}
-                    {#:placeholder="$t('frosh-tools.chooseStateMachine')"#}
-                {#/>#}
-            {#</div>#}
-        {#</template>#}
-        {#<div class="frosh-tab-sm__body">#}
-            {#Test#}
-        {#</div>#}
-        {#[><div class="frosh-tab-sm__body"><]#}
-            {#[><ft-empty<]#}
-                {#[>v-if="!selectedStateMachine"<]#}
-                {#[>icon="flow"<]#}
-                {#[>title="No state machine selected"<]#}
-                {#[>sub="Pick one from the dropdown above to render its diagram."<]#}
-            {#[>/><]#}
-            {#[><div id="states"><]#}
-                {#[><div v-for="state in states"><]#}
-                {#[>{{state.name}}<]#}
-                {#[></div><]#}
-            {#[></div><]#}
-            {#[>[><div<]<]#}
-                {#[>[>id="state_machine"<]<]#}
-                {#[>[>class="frosh-tab-sm__canvas"<]<]#}
-                {#[>[>v-show="selectedStateMachine"<]<]#}
-            {#[>[>></div><]<]#}
-        {#[></div><]#}
-    {#</ft-panel>#}
+
+    <template v-if="stateMachine">
+        <div class="sm-explorer__layout">
+            {# ── State List ── #}
+            <ft-panel :title="$t('frosh-tools.tabs.state-machines.label')" :count="filteredStates.length">
+                {#<template #actions>#}
+                    <div class="sm-explorer__search">
+                        <input
+                            v-model="stateSearch"
+                            type="text"
+                            class="sm-explorer__search-input"
+                            :placeholder="$t('frosh-tools.tabs.state-machines.searchStates')"
+                        />
+                    </div>
+                {#</template>#}
+
+                <div class="sm-state-list">
+                    <div
+                        v-for="state in filteredStates"
+                        :key="state.id"
+                        class="sm-state-list__item"
+                        :class="{
+                            'is-selected': state.id === selectedStateId,
+                            [`sm-state-list__item--${getStateColor(state)}`]: true,
+                        }"
+                        @click="selectState(state.id)"
+                    >
+                        <span
+                            class="sm-state-list__dot"
+                            :class="`sm-state-list__dot--${getStateColor(state)}`"
+                        ></span>
+                        <span class="sm-state-list__name">{{ state.name }}</span>
+                        <ft-pill
+                            v-if="isInitialState(state)"
+                            variant="accent"
+                            :bare="true"
+                        >I</ft-pill>
+                        <ft-pill
+                            v-if="isTerminalState(state)"
+                            variant="muted"
+                            :bare="true"
+                        >T</ft-pill>
+                    </div>
+
+                    <ft-empty
+                        v-if="filteredStates.length === 0"
+                        icon="info"
+                        :title="$t('frosh-tools.tabs.state-machines.noStateSelected')"
+                    />
+                </div>
+            </ft-panel>
+
+            {# ── State Details ── #}
+            <ft-panel
+                :title="selectedState ? selectedState.name : $t('frosh-tools.tabs.state-machines.noStateSelected')"
+                :count="selectedState ? selectedState.technicalName : null"
+            >
+                <template v-if="selectedState">
+                    {# Properties #}
+                    <div class="sm-detail__section">
+                        <h3 class="sm-detail__heading">
+                            {{ $t('frosh-tools.tabs.state-machines.properties') }}
+                        </h3>
+                        <dl class="ft-kv">
+                            <dt>{{ $t('frosh-tools.tabs.state-machines.technicalName') }}</dt>
+                            <dd>{{ selectedState.technicalName }}</dd>
+                            <dt>{{ $t('frosh-tools.tabs.state-machines.stateId') }}</dt>
+                            <dd class="ft-mono">{{ selectedState.id }}</dd>
+                            <dt>{{ $t('frosh-tools.tabs.state-machines.initialState') }}</dt>
+                            <dd>{{ isInitialState(selectedState) ? $t('frosh-tools.tabs.state-machines.yes') : $t('frosh-tools.tabs.state-machines.no') }}</dd>
+                            <dt>{{ $t('frosh-tools.tabs.state-machines.terminalState') }}</dt>
+                            <dd>{{ isTerminalState(selectedState) ? $t('frosh-tools.tabs.state-machines.yes') : $t('frosh-tools.tabs.state-machines.no') }}</dd>
+                            <dt>{{ $t('frosh-tools.tabs.state-machines.incomingTransitions') }}</dt>
+                            <dd>{{ incomingTransitions.length }}</dd>
+                            <dt>{{ $t('frosh-tools.tabs.state-machines.outgoingTransitions') }}</dt>
+                            <dd>{{ outgoingTransitions.length }}</dd>
+                        </dl>
+                    </div>
+
+                    <div class="ft-divider"></div>
+
+                    {# Incoming Transitions #}
+                    <div class="sm-detail__section">
+                        <h3 class="sm-detail__heading">
+                            {{ $t('frosh-tools.tabs.state-machines.incomingTransitions') }}
+                            <span class="sm-detail__count">{{ incomingTransitions.length }}</span>
+                        </h3>
+                        <div
+                            v-for="t in incomingTransitions"
+                            :key="t.id"
+                            class="sm-transition sm-transition--incoming"
+                            @click="selectState(t.fromStateId)"
+                        >
+                            <span class="sm-transition__action">{{ t.actionName }}</span>
+                            <span class="sm-transition__arrow">←</span>
+                            <span class="sm-transition__state">{{ t.fromState ? t.fromState.name : t.fromStateId }}</span>
+                        </div>
+                        <div v-if="incomingTransitions.length === 0" class="sm-detail__empty">
+                            —
+                        </div>
+                    </div>
+
+                    <div class="ft-divider"></div>
+
+                    {# Outgoing Transitions #}
+                    <div class="sm-detail__section">
+                        <h3 class="sm-detail__heading">
+                            {{ $t('frosh-tools.tabs.state-machines.outgoingTransitions') }}
+                            <span class="sm-detail__count">{{ outgoingTransitions.length }}</span>
+                        </h3>
+                        <div
+                            v-for="t in outgoingTransitions"
+                            :key="t.id"
+                            class="sm-transition sm-transition--outgoing"
+                            @click="selectState(t.toStateId)"
+                        >
+                            <span class="sm-transition__action">{{ t.actionName }}</span>
+                            <span class="sm-transition__arrow">→</span>
+                            <span class="sm-transition__state">{{ t.toState ? t.toState.name : t.toStateId }}</span>
+                        </div>
+                        <div v-if="outgoingTransitions.length === 0" class="sm-detail__empty">
+                            —
+                        </div>
+                    </div>
+
+                    <div class="ft-divider"></div>
+
+                    {# Actions #}
+                    <div class="sm-detail__section">
+                        <h3 class="sm-detail__heading">
+                            {{ $t('frosh-tools.tabs.state-machines.actions') }}
+                        </h3>
+                        <div class="sm-actions">
+                            <span
+                                v-for="action in stateActions"
+                                :key="action"
+                                class="sm-actions__item"
+                            >{{ action }}()</span>
+                        </div>
+                        <div v-if="stateActions.length === 0" class="sm-detail__empty">
+                            —
+                        </div>
+                    </div>
+                </template>
+
+                <ft-empty
+                    v-else
+                    icon="info"
+                    :title="$t('frosh-tools.tabs.state-machines.noStateSelected')"
+                />
+            </ft-panel>
+
+            {# ── Graph ── #}
+            <ft-panel :title="$t('frosh-tools.tabs.state-machines.viewModes.' + viewMode)">
+                <template #actions>
+                    <div class="sm-graph__controls">
+                        <button class="ft-btn ft-btn--ghost ft-btn--icon" @click="zoomIn" :title="$t('frosh-tools.tabs.state-machines.graph.zoomIn')">
+                            <ft-icon name="zoom-in" :size="14" />
+                        </button>
+                        <span class="sm-graph__zoom-level">{{ Math.round(zoom * 100) }}%</span>
+                        <button class="ft-btn ft-btn--ghost ft-btn--icon" @click="zoomOut" :title="$t('frosh-tools.tabs.state-machines.graph.zoomOut')">
+                            <ft-icon name="zoom-out" :size="14" />
+                        </button>
+                        <button class="ft-btn ft-btn--ghost ft-btn--icon" @click="resetView" :title="$t('frosh-tools.tabs.state-machines.graph.resetView')">
+                            <ft-icon name="refresh" :size="14" />
+                        </button>
+                    </div>
+                </template>
+
+                {# Tree View #}
+                <div v-if="viewMode === 'tree' && selectedState" class="sm-tree">
+                    <div class="sm-tree__root">
+                        <span
+                            class="sm-tree__node-label"
+                            :class="`sm-tree__node-label--${getStateColor(selectedState)}`"
+                            @click="selectState(selectedState.id)"
+                        >{{ selectedState.name }}</span>
+                        <template v-if="selectedState && buildTreeNodes(selectedState.id)">
+                            <div
+                                v-for="child in buildTreeNodes(selectedState.id).children"
+                                :key="child.transition.id"
+                                class="sm-tree__branch"
+                            >
+                                <div class="sm-tree__edge">
+                                    <span class="sm-tree__action">{{ child.transition.actionName }}</span>
+                                </div>
+                                <template v-if="child.child">
+                                    <div class="sm-tree__child">
+                                        <span
+                                            class="sm-tree__node-label"
+                                            :class="`sm-tree__node-label--${child.child.color}`"
+                                            @click="selectState(child.child.state.id)"
+                                        >{{ child.child.state.name }}</span>
+                                        <template v-if="child.child.children.length > 0">
+                                            <div
+                                                v-for="grandchild in child.child.children"
+                                                :key="grandchild.transition.id"
+                                                class="sm-tree__branch sm-tree__branch--nested"
+                                            >
+                                                <div class="sm-tree__edge">
+                                                    <span class="sm-tree__action">{{ grandchild.transition.actionName }}</span>
+                                                </div>
+                                                <template v-if="grandchild.child">
+                                                    <div class="sm-tree__child">
+                                                        <span
+                                                            class="sm-tree__node-label"
+                                                            :class="`sm-tree__node-label--${grandchild.child.color}`"
+                                                            @click="selectState(grandchild.child.state.id)"
+                                                        >{{ grandchild.child.state.name }}</span>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+                <ft-empty
+                    v-else-if="viewMode === 'tree' && !selectedState"
+                    icon="info"
+                    :title="$t('frosh-tools.tabs.state-machines.noStateSelected')"
+                />
+
+                {# Mermaid Graph (1-hop and full) #}
+                <div
+                    v-show="viewMode !== 'tree'"
+                    ref="graphContainer"
+                    class="sm-graph"
+                    @wheel.prevent="onWheel"
+                    @mousedown="onMouseDown"
+                    @mousemove="onMouseMove"
+                    @mouseup="onMouseUp"
+                    @mouseleave="onMouseUp"
+                >
+                    <div ref="mermaidSource" class="sm-graph-inner"></div>
+                </div>
+
+                <ft-empty
+                    v-if="viewMode !== 'tree' && !graphDiagram"
+                    icon="flow"
+                    :title="$t('frosh-tools.tabs.state-machines.noStateSelected')"
+                />
+            </ft-panel>
+        </div>
+
+        {# ── Action Groups ── #}
+        <ft-panel
+            :title="$t('frosh-tools.tabs.state-machines.actionGroups')"
+            class="sm-explorer__groups"
+        >
+            <div class="sm-groups">
+                <div
+                    v-for="(actions, category) in actionGroups"
+                    :key="category"
+                    class="sm-groups__category"
+                >
+                    <h4 class="sm-groups__title">
+                        {{ $t(`frosh-tools.tabs.state-machines.categories.${category}`) }}
+                    </h4>
+                    <div class="sm-groups__items">
+                        <span
+                            v-for="action in actions"
+                            :key="action"
+                            class="sm-groups__action"
+                            @click="filterTransition = filterTransition === action ? '' : action"
+                            :class="{ 'is-active': filterTransition === action }"
+                        >{{ action }}</span>
+                    </div>
+                </div>
+            </div>
+        </ft-panel>
+    </template>
+
+    <ft-empty
+        v-else-if="!isLoading"
+        icon="flow"
+        :title="$t('frosh-tools.tabs.state-machines.noStateMachine')"
+        :sub="$t('frosh-tools.chooseStateMachine')"
+    />
+
+    {# Tooltip #}
+    <div
+        v-show="tooltipVisible"
+        class="sm-tooltip"
+        :style="{ left: tooltipX + 'px', top: tooltipY + 'px' }"
+    >
+        <pre class="sm-tooltip__content">{{ tooltipText }}</pre>
+    </div>
 </div>

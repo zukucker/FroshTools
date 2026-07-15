@@ -1,54 +1,461 @@
-.state-machine-explorer{
-    display:flex;
-    gap: 20px;
-    .ft-panel + .ft-panel{
-        margin-top:0;
+// ── State Machine Explorer ──────────────────────────────────────
+
+.sm-explorer {
+    .ft-panel + .ft-panel {
+        margin-top: 0;
     }
-    .state{
-        border-bottom:1px solid grey;
-        margin:2rem auto;
+    &__toolbar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
     }
-    .incoming-transitions{
-        .transition{
-            border:1px solid grey;
-            border-radius:10px;
-            padding:1rem;
-            margin:1rem 0;
+
+    &__select {
+        min-width: 260px;
+    }
+
+    &__view-modes {
+        display: flex;
+        gap: 4px;
+        background: var(--ft-surface-2);
+        border-radius: var(--ft-radius-sm);
+        padding: 3px;
+    }
+
+    &__filters {
+        display: flex;
+        gap: 8px;
+        margin-left: auto;
+    }
+
+    &__filter-select {
+        min-width: 160px;
+    }
+
+    &__layout {
+        display: grid;
+        grid-template-columns: 260px 320px 1fr;
+        gap: 18px;
+        align-items: start;
+
+        @media (max-width: 1200px) {
+            grid-template-columns: 220px 280px 1fr;
+        }
+
+        @media (max-width: 900px) {
+            grid-template-columns: 1fr;
         }
     }
-    .outgoing-transitions{
-        .transition{
-            display:flex;
-            justify-content: space-between;
-        }
+
+    &__groups {
+        margin-top: 18px;
     }
 }
 
-.frosh-tab-sm {
-    &__select {
-        min-width: 280px;
-        .sw-single-select {
-            margin: 0;
-        }
+// ── Search ──────────────────────────────────────────────────────
+
+.sm-explorer__search {
+    width: 100%;
+    margin: 1rem auto;
+}
+
+.sm-explorer__search-input {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid var(--ft-border);
+    border-radius: var(--ft-radius-sm);
+    font-size: 13px;
+    background: var(--ft-surface);
+    color: var(--ft-text);
+    outline: none;
+    transition: border-color var(--ft-transition);
+
+    &::placeholder {
+        color: var(--ft-text-muted);
     }
 
-    &__body {
-        min-height: 320px;
+    &:focus {
+        border-color: var(--ft-accent);
+    }
+}
+
+// ── State List ──────────────────────────────────────────────────
+
+.sm-state-list {
+    max-height: calc(100vh - 280px);
+    overflow-y: auto;
+    margin: -4px -4px 0;
+    padding: 4px;
+}
+
+.sm-state-list__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: var(--ft-radius-sm);
+    cursor: pointer;
+    transition:
+        background var(--ft-transition),
+        color var(--ft-transition);
+    font-size: 13.5px;
+
+    &:hover {
+        background: var(--ft-surface-hover);
     }
 
-    &__canvas {
-        background: var(--ft-surface-2);
-        border: 1px dashed var(--ft-border);
-        border-radius: var(--ft-radius-md);
-        padding: 24px;
-        display: flex;
-        justify-content: center;
-        overflow: auto;
-        min-height: 320px;
-
-        svg {
-            max-width: 100%;
-            height: auto;
-        }
+    &.is-selected {
+        background: var(--ft-accent-soft);
+        color: var(--ft-accent);
+        font-weight: 600;
     }
+}
+
+.sm-state-list__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+
+    &--info {
+        background: var(--ft-accent);
+    }
+    &--success {
+        background: var(--ft-success);
+    }
+    &--warning {
+        background: var(--ft-warning);
+    }
+    &--danger {
+        background: var(--ft-danger);
+    }
+    &--muted {
+        background: var(--ft-neutral);
+    }
+    &--accent {
+        background: var(--ft-accent);
+    }
+}
+
+.sm-state-list__name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+// ── State Details ───────────────────────────────────────────────
+
+.sm-detail__section {
+    &:first-child {
+        margin-top: 0;
+    }
+}
+
+.sm-detail__heading {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ft-text-muted);
+    margin: 0 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sm-detail__count {
+    background: var(--ft-surface-2);
+    color: var(--ft-text-soft);
+    padding: 1px 7px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.sm-detail__empty {
+    color: var(--ft-text-muted);
+    font-size: 13px;
+    padding: 4px 0;
+}
+
+// ── Transitions ─────────────────────────────────────────────────
+
+.sm-transition {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: var(--ft-radius-sm);
+    font-size: 13px;
+    cursor: pointer;
+    transition: background var(--ft-transition);
+
+    &:hover {
+        background: var(--ft-surface-hover);
+    }
+
+    &__action {
+        font-family: var(--ft-mono);
+        font-size: 12.5px;
+        font-weight: 500;
+        color: var(--ft-text);
+    }
+
+    &__arrow {
+        color: var(--ft-text-muted);
+        font-size: 12px;
+    }
+
+    &__state {
+        color: var(--ft-text-soft);
+        margin-left: auto;
+        font-size: 12.5px;
+    }
+}
+
+// ── Actions ─────────────────────────────────────────────────────
+
+.sm-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.sm-actions__item {
+    font-family: var(--ft-mono);
+    font-size: 12.5px;
+    padding: 4px 10px;
+    background: var(--ft-surface-2);
+    border-radius: var(--ft-radius-sm);
+    color: var(--ft-text-soft);
+}
+
+// ── Graph ───────────────────────────────────────────────────────
+
+.sm-graph {
+    position: relative;
+    overflow: hidden;
+    background: var(--ft-surface-2);
+    border: 1px dashed var(--ft-border);
+    border-radius: var(--ft-radius-md);
+    min-height: 350px;
+    cursor: grab;
+    user-select: none;
+
+    &:active {
+        cursor: grabbing;
+    }
+}
+
+.sm-graph-inner {
+    transform-origin: 0 0;
+    display: inline-block;
+    padding: 24px;
+
+    svg {
+        max-width: none;
+    }
+}
+
+.sm-graph__controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.sm-graph__zoom-level {
+    font-size: 11px;
+    font-family: var(--ft-mono);
+    color: var(--ft-text-muted);
+    min-width: 36px;
+    text-align: center;
+}
+
+// ── Tree View ───────────────────────────────────────────────────
+
+.sm-tree {
+    padding: 12px 0;
+    overflow: auto;
+    max-height: calc(100vh - 280px);
+}
+
+.sm-tree__root {
+    padding-left: 0;
+}
+
+.sm-tree__branch {
+    padding-left: 24px;
+    position: relative;
+
+    &::before {
+        content: '';
+        position: absolute;
+        left: 8px;
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        background: var(--ft-border);
+    }
+
+    &--nested {
+        padding-left: 20px;
+    }
+}
+
+.sm-tree__edge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 0;
+    position: relative;
+
+    &::before {
+        content: '';
+        position: absolute;
+        left: -16px;
+        top: 50%;
+        width: 12px;
+        height: 1px;
+        background: var(--ft-border);
+    }
+}
+
+.sm-tree__action {
+    font-family: var(--ft-mono);
+    font-size: 11.5px;
+    color: var(--ft-accent);
+    background: var(--ft-accent-soft);
+    padding: 2px 8px;
+    border-radius: var(--ft-radius-sm);
+}
+
+.sm-tree__child {
+    padding: 2px 0 8px;
+}
+
+.sm-tree__node-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: var(--ft-radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background var(--ft-transition);
+
+    &:hover {
+        background: var(--ft-surface-hover);
+    }
+
+    &--info {
+        background: var(--ft-accent-soft);
+        color: var(--ft-accent);
+    }
+
+    &--success {
+        background: var(--ft-success-soft);
+        color: var(--ft-success);
+    }
+
+    &--warning {
+        background: var(--ft-warning-soft);
+        color: var(--ft-warning);
+    }
+
+    &--danger {
+        background: var(--ft-danger-soft);
+        color: var(--ft-danger);
+    }
+
+    &--muted {
+        background: var(--ft-neutral-soft);
+        color: var(--ft-text-muted);
+    }
+
+    &--accent {
+        background: var(--ft-accent-soft);
+        color: var(--ft-accent);
+    }
+}
+
+// ── Action Groups ───────────────────────────────────────────────
+
+.sm-groups {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 18px;
+}
+
+.sm-groups__category {
+    min-width: 0;
+}
+
+.sm-groups__title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ft-text-muted);
+    margin: 0 0 8px;
+}
+
+.sm-groups__items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.sm-groups__action {
+    font-family: var(--ft-mono);
+    font-size: 12px;
+    padding: 4px 10px;
+    background: var(--ft-surface-2);
+    border: 1px solid var(--ft-border);
+    border-radius: var(--ft-radius-sm);
+    color: var(--ft-text-soft);
+    cursor: pointer;
+    transition:
+        background var(--ft-transition),
+        border-color var(--ft-transition),
+        color var(--ft-transition);
+
+    &:hover {
+        background: var(--ft-surface-hover);
+        border-color: var(--ft-border-strong);
+    }
+
+    &.is-active {
+        background: var(--ft-accent-soft);
+        border-color: var(--ft-accent);
+        color: var(--ft-accent);
+    }
+}
+
+// ── Tooltip ─────────────────────────────────────────────────────
+
+.sm-tooltip {
+    position: fixed;
+    z-index: 9999;
+    pointer-events: none;
+    background: var(--ft-surface);
+    border: 1px solid var(--ft-border);
+    border-radius: var(--ft-radius-sm);
+    box-shadow: var(--ft-shadow-md);
+    padding: 8px 12px;
+    max-width: 320px;
+}
+
+.sm-tooltip__content {
+    margin: 0;
+    font-family: var(--ft-mono);
+    font-size: 12px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-all;
+    color: var(--ft-text);
 }
