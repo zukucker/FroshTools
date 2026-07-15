@@ -19,6 +19,7 @@ Component.register('frosh-tools-tab-state-machines', {
         return {
             selectedStateMachine: null,
             stateMachineOptions: [],
+            states: [],
             isLoading: true,
             renderCount: 0,
         };
@@ -105,6 +106,8 @@ Component.register('frosh-tools-tab-state-machines', {
                 criteria
             );
 
+            await this.buildStateMachineExplorer(stateMachineChangeId)
+
             const container = document.getElementById('state_machine');
 
             if (!stateMachine) {
@@ -121,5 +124,18 @@ Component.register('frosh-tools-tab-state-machines', {
             );
             container.innerHTML = svg;
         },
+        async buildStateMachineExplorer(stateMachineChangeId){
+            const criteria = new Criteria([stateMachineChangeId]);
+            criteria.addAssociation('states');
+            criteria.addAssociation('transitions');
+
+            const stateMachine = await this.stateMachineRepository.get(
+                stateMachineChangeId,
+                Shopware.Context.api,
+                criteria
+            );
+            console.error(stateMachine)
+            this.states = stateMachine.states
+        }
     },
 });

@@ -1,3 +1,29 @@
+.state-machine-explorer{
+    display:flex;
+    gap: 20px;
+    .ft-panel + .ft-panel{
+        margin-top:0;
+    }
+    .state{
+        border-bottom:1px solid grey;
+        margin:2rem auto;
+    }
+    .incoming-transitions{
+        .transition{
+            border:1px solid grey;
+            border-radius:10px;
+            padding:1rem;
+            margin:1rem 0;
+        }
+    }
+    .outgoing-transitions{
+        .transition{
+            display:flex;
+            justify-content: space-between;
+        }
+    }
+}
+
 .frosh-tab-sm {
     &__select {
         min-width: 280px;
