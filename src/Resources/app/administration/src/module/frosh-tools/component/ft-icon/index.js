@@ -25,6 +25,8 @@ import {
     Workflow,
     X,
     Zap,
+    ZoomIn,
+    ZoomOut
 } from 'lucide-static';
 
 const ICONS = {
@@ -49,6 +51,8 @@ const ICONS = {
     flow: Workflow,
     chart: LineChart,
     close: X,
+    'zoom-in': ZoomIn,
+    'zoom-out': ZoomOut
 };
 
 const { Component } = Shopware;
